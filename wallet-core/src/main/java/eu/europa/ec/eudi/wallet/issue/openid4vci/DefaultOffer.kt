@@ -42,7 +42,7 @@ internal data class DefaultOffer(
     override val offeredDocuments: List<Offer.OfferedDocument>
         get() = issuerMetadata.credentialConfigurationsSupported
             .filterKeys { it in credentialOffer.credentialConfigurationIdentifiers }
-            .filterValues { credentialConfigurationFilter(it) }
+            //.filterValues { credentialConfigurationFilter(it) }
             .map { (id, conf) -> DefaultOfferedDocument(id, conf) }
 
     override val txCodeSpec: Offer.TxCodeSpec?
