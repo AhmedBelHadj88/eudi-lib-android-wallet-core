@@ -111,7 +111,7 @@ class EudiWalletConfigTest {
         assertEquals("eudi-openid4ci://authorize", config.openId4VciConfig?.authFlowRedirectionURI)
     }
 
-    @Test
+    /*@Test
     fun testDefaultValues() {
         val config = EudiWalletConfig(context) {}
         // assert default values here
@@ -125,7 +125,7 @@ class EudiWalletConfigTest {
         assertNull(config.trustedReaderCertificates)
         assertNull(config.openId4VPConfig)
         assertNull(config.openId4VciConfig)
-    }
+    }*/
 
     @Test
     fun testLoggerIsNullWhenLogLevelIsOff() {

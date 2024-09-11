@@ -3,8 +3,7 @@
 # make
 
 [androidJvm]\
-fun [make](make.md)(block: [OpenId4VciManager.Config.Builder](../-builder/index.md).()
--&gt; [Unit](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html)): [OpenId4VciManager.Config](../index.md)
+fun [make](make.md)(block: [OpenId4VciManager.Config.Builder](../-builder/index.md).() -&gt; [Unit](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html)): [OpenId4VciManager.Config](../index.md)
 
 Create an instance of [Config](../index.md)
 
@@ -12,6 +11,6 @@ Create an instance of [Config](../index.md)
 
 androidJvm
 
-|       |                                                            |
-|-------|------------------------------------------------------------|
+| | |
+|---|---|
 | block | the block to configure the [Builder](../-builder/index.md) |

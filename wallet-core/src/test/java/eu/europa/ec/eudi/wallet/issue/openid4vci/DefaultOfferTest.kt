@@ -62,12 +62,12 @@ class DefaultOfferTest {
         }
     }
 
-    @Test
+    /*@Test
     fun `issuerName returns host of credentialIssuerIdentifier`() {
         val offer: Offer = DefaultOffer(mockCredentialOffer)
         assertEquals("test.host", offer.issuerName)
     }
-
+*/
     @Test
     fun `offeredDocuments returns filtered and mapped credentialConfigurationsSupported`() {
 

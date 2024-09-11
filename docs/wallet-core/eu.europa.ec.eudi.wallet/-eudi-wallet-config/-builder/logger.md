@@ -3,8 +3,7 @@
 # logger
 
 [androidJvm]\
-fun [logger](logger.md)(
-logger: [Logger](../../../eu.europa.ec.eudi.wallet.logging/-logger/index.md)): [EudiWalletConfig.Builder](index.md)
+fun [logger](logger.md)(logger: [Logger](../../../eu.europa.ec.eudi.wallet.logging/-logger/index.md)): [EudiWalletConfig.Builder](index.md)
 
 Set a logger
 
@@ -16,8 +15,8 @@ Set a logger
 
 androidJvm
 
-|        |            |
-|--------|------------|
+| | |
+|---|---|
 | logger | The logger |
 
 [androidJvm]\

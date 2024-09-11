@@ -3,5 +3,4 @@
 # withClientId
 
 [androidJvm]\
-fun [withClientId](with-client-id.md)(
-clientId: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)): [OpenId4VciManager.Config.Builder](index.md)
+fun [withClientId](with-client-id.md)(clientId: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)): [OpenId4VciManager.Config.Builder](index.md)

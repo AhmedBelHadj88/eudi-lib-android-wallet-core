@@ -11,6 +11,6 @@ Setting the `executor` is optional and defines the executor that will be used to
 
 androidJvm
 
-|          |                                                                             |
-|----------|-----------------------------------------------------------------------------|
+| | |
+|---|---|
 | executor | the executor to use for callbacks. If null, the main executor will be used. |

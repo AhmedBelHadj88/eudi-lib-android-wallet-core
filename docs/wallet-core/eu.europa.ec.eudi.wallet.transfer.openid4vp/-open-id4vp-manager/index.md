@@ -4,8 +4,7 @@
 
 class [OpenId4vpManager](index.md)(context: [Context](https://developer.android.com/reference/kotlin/android/content/Context.html), openId4VpConfig: [OpenId4VpConfig](../-open-id4-vp-config/index.md), val responseGenerator: [OpenId4VpCBORResponseGeneratorImpl](../-open-id4-vp-c-b-o-r-response-generator-impl/index.md)) : TransferEvent.Listenable
 
-OpenId4vp manager. This class is used to manage the OpenId4vp transfer method. It is used to resolve the request uri and
-send the response.
+OpenId4vp manager. This class is used to manage the OpenId4vp transfer method. It is used to resolve the request uri and send the response.
 
 Example:
 
@@ -76,10 +75,10 @@ openId4vpManager.resolveRequestUri(requestURI)
 
 androidJvm
 
-|                   |                                                  |
-|-------------------|--------------------------------------------------|
-| context           | the application context                          |
-| openId4VpConfig   | the configuration for OpenId4Vp                  |
+| | |
+|---|---|
+| context | the application context |
+| openId4VpConfig | the configuration for OpenId4Vp |
 | responseGenerator | that parses the request and creates the response |
 
 ## Constructors
@@ -90,8 +89,8 @@ androidJvm
 
 ## Types
 
-| Name                             | Summary                                                 |
-|----------------------------------|---------------------------------------------------------|
+| Name | Summary |
+|---|---|
 | [Companion](-companion/index.md) | [androidJvm]<br>object [Companion](-companion/index.md) |
 
 ## Functions
@@ -108,8 +107,8 @@ androidJvm
 
 ## Properties
 
-| Name                                                 | Summary                                                                                                                                                                                                            |
-|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [ktorHttpClientFactory](ktor-http-client-factory.md) | [androidJvm]<br>var [ktorHttpClientFactory](ktor-http-client-factory.md): () -&gt; HttpClient<br>the factory to create the http client. By default, it uses the DefaultHttpClientFactory                           |
-| [logger](logger.md)                                  | [androidJvm]<br>var [logger](logger.md): [Logger](../../eu.europa.ec.eudi.wallet.logging/-logger/index.md)?<br>the logger                                                                                          |
-| [responseGenerator](response-generator.md)           | [androidJvm]<br>val [responseGenerator](response-generator.md): [OpenId4VpCBORResponseGeneratorImpl](../-open-id4-vp-c-b-o-r-response-generator-impl/index.md)<br>that parses the request and creates the response |
+| Name | Summary |
+|---|---|
+| [ktorHttpClientFactory](ktor-http-client-factory.md) | [androidJvm]<br>var [ktorHttpClientFactory](ktor-http-client-factory.md): () -&gt; HttpClient<br>the factory to create the http client. By default, it uses the DefaultHttpClientFactory |
+| [logger](logger.md) | [androidJvm]<br>var [logger](logger.md): [Logger](../../eu.europa.ec.eudi.wallet.logging/-logger/index.md)?<br>the logger |
+| [responseGenerator](response-generator.md) | [androidJvm]<br>val [responseGenerator](response-generator.md): [OpenId4VpCBORResponseGeneratorImpl](../-open-id4-vp-c-b-o-r-response-generator-impl/index.md)<br>that parses the request and creates the response |

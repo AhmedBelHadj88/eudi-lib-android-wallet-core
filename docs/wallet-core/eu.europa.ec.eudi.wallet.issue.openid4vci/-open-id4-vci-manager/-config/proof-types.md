@@ -3,5 +3,4 @@
 # proofTypes
 
 [androidJvm]\
-val [proofTypes](proof-types.md): [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)
-&lt;[OpenId4VciManager.Config.ProofType](-proof-type/index.md)&gt;
+val [proofTypes](proof-types.md): [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[OpenId4VciManager.Config.ProofType](-proof-type/index.md)&gt;

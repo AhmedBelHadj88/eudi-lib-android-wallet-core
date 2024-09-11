@@ -9,8 +9,8 @@ constructor(context: [Context](https://developer.android.com/reference/kotlin/an
 
 androidJvm
 
-|                   |                                                  |
-|-------------------|--------------------------------------------------|
-| context           | the application context                          |
-| openId4VpConfig   | the configuration for OpenId4Vp                  |
+| | |
+|---|---|
+| context | the application context |
+| openId4VpConfig | the configuration for OpenId4Vp |
 | responseGenerator | that parses the request and creates the response |
