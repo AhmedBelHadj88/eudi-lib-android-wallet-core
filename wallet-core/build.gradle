@@ -36,7 +36,7 @@ plugins {
 
 apply from: 'jacoco.gradle'
 
-/*licenseReport {
+licenseReport {
     renderers = [new InventoryMarkdownReportRenderer("licenses.md", "Your Project License Report")]
 }
 
@@ -44,7 +44,7 @@ tasks.register('generateJitpackTagReport', Copy) {
     from "$buildDir/reports/dependency-license/licenses.md"
     into "$rootDir"
     dependsOn 'generateLicenseReport'
-}*/
+}
 
 android {
     namespace NAMESPACE
@@ -214,16 +214,16 @@ licenseReport {
     from "$buildDir/reports/dependency-license/licenses.md"
     into "$rootDir"
     dependsOn 'generateLicenseReport'
-}*/
+}
 
 
-/*generateLicenseReport.finalizedBy("copyLicenseReport")
+generateLicenseReport.finalizedBy("copyLicenseReport")
 tasks.named("dokkaGfm") {
     mustRunAfter(tasks.named("copyLicenseReport"))
-}*/
+}
 
-//build.finalizedBy("generateLicenseReport", "dokkaGfm")
-
+build.finalizedBy("generateLicenseReport", "dokkaGfm")
+*/
 tasks.register('dokkaHtmlJar', Jar.class) {
     dependsOn(dokkaHtml)
     from(dokkaHtml)
