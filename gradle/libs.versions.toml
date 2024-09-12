@@ -1,7 +1,7 @@
 [versions]
 appcompat = "1.7.0"
 biometricKtx = "1.1.0"
-bouncy-castle = "1.78.1"
+bouncy-castle = "1.77"
 cbor = "0.9"
 coseJava = "1.1.0"
 dependency-license-report = "2.8"
