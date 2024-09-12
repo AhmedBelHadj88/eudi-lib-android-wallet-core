@@ -18,6 +18,7 @@ import com.github.jk1.license.filter.ExcludeTransitiveDependenciesFilter
 import com.github.jk1.license.filter.LicenseBundleNormalizer
 import com.github.jk1.license.filter.ReduceDuplicateLicensesFilter
 import com.github.jk1.license.render.InventoryMarkdownReportRenderer
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
@@ -35,10 +36,20 @@ plugins {
 
 apply from: 'jacoco.gradle'
 
+/*licenseReport {
+    renderers = [new InventoryMarkdownReportRenderer("licenses.md", "Your Project License Report")]
+}
+
+tasks.register('generateJitpackTagReport', Copy) {
+    from "$buildDir/reports/dependency-license/licenses.md"
+    into "$rootDir"
+    dependsOn 'generateLicenseReport'
+}*/
+
 android {
     namespace NAMESPACE
     group GROUP
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 26
@@ -69,11 +80,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.toVersion(libs.versions.java.get())
-        targetCompatibility JavaVersion.toVersion(libs.versions.java.get())
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = libs.versions.java.get()
+        jvmTarget = "17"
     }
 
     sourceSets {
@@ -83,12 +94,17 @@ android {
             }
         }
     }
-
+    tasks.withType(KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
+    }
     testOptions {
         unitTests.all {
             useJUnitPlatform()
         }
     }
+    buildToolsVersion '34.0.0'
 
 //    publishing {
 //        singleVariant('release') {
@@ -184,6 +200,7 @@ dokkaGfm {
     outputDirectory.set(file("$rootDir/docs"))
 }
 
+
 licenseReport {
     unionParentPomLicenses = false
     filters = [new LicenseBundleNormalizer(), new ReduceDuplicateLicensesFilter(), new ExcludeTransitiveDependenciesFilter()]
@@ -193,13 +210,19 @@ licenseReport {
     renderers = [new InventoryMarkdownReportRenderer("licenses.md", "${POM_DESCRIPTION}")]
 }
 
-tasks.register('copyLicenseReport', Copy) {
+/*tasks.register('copyLicenseReport', Copy) {
     from "$buildDir/reports/dependency-license/licenses.md"
     into "$rootDir"
     dependsOn 'generateLicenseReport'
-}
-generateLicenseReport.finalizedBy("copyLicenseReport")
-build.finalizedBy("generateLicenseReport", "dokkaGfm")
+}*/
+
+
+/*generateLicenseReport.finalizedBy("copyLicenseReport")
+tasks.named("dokkaGfm") {
+    mustRunAfter(tasks.named("copyLicenseReport"))
+}*/
+
+//build.finalizedBy("generateLicenseReport", "dokkaGfm")
 
 tasks.register('dokkaHtmlJar', Jar.class) {
     dependsOn(dokkaHtml)
