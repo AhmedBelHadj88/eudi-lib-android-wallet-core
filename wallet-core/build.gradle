@@ -51,6 +51,13 @@ android {
     group GROUP
     compileSdk 34
 
+   /* configurations {
+        all*.exclude module: 'bcprov-jdk15on'
+        all*.exclude module: 'bcprov-jdk18on'
+        all*.exclude module: 'bcutil-jdk18on'
+        all*.exclude module: 'cert-cvc'
+    }*/
+
     defaultConfig {
         minSdk 26
         targetSdk 33

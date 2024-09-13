@@ -77,7 +77,7 @@ internal class ProcessResponse(
         continuations.values.forEach { it.cancel() }
     }
 
-    fun processSubmittedRequest(unsignedDocument: UnsignedDocument, outcome: SubmissionOutcome) {
+  /*  fun processSubmittedRequest(unsignedDocument: UnsignedDocument, outcome: SubmissionOutcome) {
         when (outcome) {
             is SubmissionOutcome.Success -> when (val credential = outcome.credentials[0]) {
                 is IssuedCredential.Issued -> try {
@@ -88,6 +88,52 @@ internal class ProcessResponse(
                 } catch (e: Throwable) {
                     documentManager.deleteDocumentById(unsignedDocument.id)
                     listener(documentFailed(unsignedDocument, e))
+                }
+
+                is IssuedCredential.Deferred -> {
+                    val contextToStore = deferredContextCreator.create(credential)
+                    documentManager.storeDeferredDocument(unsignedDocument, contextToStore.toByteArray())
+                        .notifyListener(unsignedDocument, isDeferred = true)
+                }
+            }
+
+            is SubmissionOutcome.InvalidProof -> {
+                documentManager.deleteDocumentById(unsignedDocument.id)
+                listener(
+                    documentFailed(
+                        unsignedDocument,
+                        IllegalStateException(outcome.errorDescription)
+                    )
+                )
+            }
+
+            is SubmissionOutcome.Failed -> {
+                documentManager.deleteDocumentById(unsignedDocument.id)
+                listener(documentFailed(unsignedDocument, outcome.error))
+            }
+        }
+    }*/
+
+        fun processSubmittedRequest(unsignedDocument: UnsignedDocument, outcome: SubmissionOutcome) {
+        when (outcome) {
+            is SubmissionOutcome.Success -> when (val credential = outcome.credentials[0]) {
+                is IssuedCredential.Issued -> try {
+                    val cborBytes = Base64.getDecoder().decode(credential.credential)
+                    logger?.d(TAG, "CBOR bytes: ${Hex.toHexString(cborBytes)}")
+                    documentManager.storeIssuedDocument(unsignedDocument, cborBytes)
+                        .notifyListener(unsignedDocument)
+                }
+                catch (e:Exception)
+                {
+                    try {
+                        val cborBytes = Base64.getUrlDecoder().decode(credential.credential)
+                        logger?.d(TAG, "CBOR bytes: ${Hex.toHexString(cborBytes)}")
+                        documentManager.storeIssuedDocument(unsignedDocument, cborBytes)
+                            .notifyListener(unsignedDocument)
+                    } catch (e: Throwable) {
+                        documentManager.deleteDocumentById(unsignedDocument.id)
+                        listener(documentFailed(unsignedDocument, e))
+                    }
                 }
 
                 is IssuedCredential.Deferred -> {
