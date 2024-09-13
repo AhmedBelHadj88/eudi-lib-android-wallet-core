@@ -34,6 +34,8 @@ dependencyResolutionManagement {
             mavenContent { snapshotsOnly() }
         }
         maven { url 'https://jitpack.io' }
+
+        maven { url 'https://maven.walt.id/repository/waltid-ssi-kit/' }
     }
 }
 rootProject.name = "eudi-lib-android-wallet-core"

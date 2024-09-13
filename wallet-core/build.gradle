@@ -165,6 +165,8 @@ dependencies {
     implementation libs.upokecenter.cbor
     implementation libs.cose.java
 
+    implementation("id.walt:waltid-sd-jwt-jvm:1.2306071235.0")
+
     testImplementation libs.junit
     testImplementation libs.junit.jupiter.params
     testImplementation libs.json
