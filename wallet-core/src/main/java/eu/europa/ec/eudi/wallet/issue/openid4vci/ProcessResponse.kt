@@ -93,7 +93,6 @@ internal class ProcessResponse(
         }
     }
 
-
     fun processSubmittedRequest(unsignedDocument: UnsignedDocument, outcome: SubmissionOutcome) {
         when (outcome) {
             is SubmissionOutcome.Success -> when (val credential = outcome.credentials[0]) {
@@ -103,10 +102,9 @@ internal class ProcessResponse(
 
                         if (parts.size == 3) {
                             val payload =
-                                Base64.getUrlDecoder().decode(parts[1])   // Decode the payload
-                            val cborBytes = Base64.getUrlDecoder().decode(payload)
-                            logger?.d(TAG, "CBOR bytes: ${Hex.toHexString(cborBytes)}")
-                            documentManager.storeDeferredDocument(unsignedDocument, cborBytes)
+                                Base64.getDecoder().decode(parts[1])   // Decode the payload
+                            logger?.d(TAG, "PAYLOAD bytes: ${Hex.toHexString(payload)}")
+                            documentManager.storeDeferredDocument(unsignedDocument, payload)
                                 .notifyListener(unsignedDocument)
                         }
                     } else {
