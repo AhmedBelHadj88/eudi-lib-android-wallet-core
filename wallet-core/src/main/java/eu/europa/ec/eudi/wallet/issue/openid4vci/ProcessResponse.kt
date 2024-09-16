@@ -16,6 +16,9 @@
 
 package eu.europa.ec.eudi.wallet.issue.openid4vci
 
+import com.nimbusds.jose.JWSObject
+import com.nimbusds.jwt.JWTParser
+import com.nimbusds.jwt.SignedJWT
 import eu.europa.ec.eudi.openid4vci.IssuedCredential
 import eu.europa.ec.eudi.openid4vci.SubmissionOutcome
 import eu.europa.ec.eudi.wallet.document.DocumentId
@@ -81,12 +84,13 @@ internal class ProcessResponse(
         continuations.values.forEach { it.cancel() }
     }
 
-    fun isValidSdJwt(token: String): Boolean {
-        // Regular expression for validating a JWT/SD-JWT
-        val sdJwtRegex = Regex("^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+(\\.[A-Za-z0-9-_]+)?$")
-
-        // Check if the token matches the regular expression
-        return sdJwtRegex.matches(token)
+    fun isSDJWT(jwtString: String): Boolean {
+        try {
+            val jwt = JWTParser.parse(jwtString) as SignedJWT
+            return jwt.state == JWSObject.State.SIGNED || jwt.state == JWSObject.State.VERIFIED
+        } catch (e: Exception) {
+            return false
+        }
     }
 
 
@@ -94,9 +98,7 @@ internal class ProcessResponse(
         when (outcome) {
             is SubmissionOutcome.Success -> when (val credential = outcome.credentials[0]) {
                 is IssuedCredential.Issued -> try {
-
-
-                    if (isValidSdJwt(credential.credential)) {
+                    if (isSDJWT(credential.credential)) {
                         val parts = credential.credential.split(".")
 
                         if (parts.size == 3) {
@@ -107,13 +109,59 @@ internal class ProcessResponse(
                             documentManager.storeDeferredDocument(unsignedDocument, cborBytes)
                                 .notifyListener(unsignedDocument)
                         }
-                        } else {
-                            val cborBytes = Base64.getUrlDecoder().decode(credential.credential)
-                            logger?.d(TAG, "CBOR bytes: ${Hex.toHexString(cborBytes)}")
-                            documentManager.storeIssuedDocument(unsignedDocument, cborBytes)
-                                .notifyListener(unsignedDocument)
-                        }
+                    } else {
+                        val cborBytes = Base64.getUrlDecoder().decode(credential.credential)
+                        logger?.d(TAG, "CBOR bytes: ${Hex.toHexString(cborBytes)}")
+                        documentManager.storeIssuedDocument(unsignedDocument, cborBytes)
+                            .notifyListener(unsignedDocument)
+                    }
 
+                    val cborBytes = Base64.getUrlDecoder().decode(credential.credential)
+                    logger?.d(TAG, "CBOR bytes: ${Hex.toHexString(cborBytes)}")
+                    documentManager.storeIssuedDocument(unsignedDocument, cborBytes)
+                        .notifyListener(unsignedDocument)
+                } catch (e: Throwable) {
+                    documentManager.deleteDocumentById(unsignedDocument.id)
+                    listener(documentFailed(unsignedDocument, e))
+                }
+
+                is IssuedCredential.Deferred -> {
+                    val contextToStore = deferredContextCreator.create(credential)
+                    documentManager.storeDeferredDocument(
+                        unsignedDocument, contextToStore.toByteArray()
+                    ).notifyListener(unsignedDocument, isDeferred = true)
+                }
+            }
+
+            is SubmissionOutcome.InvalidProof -> {
+                documentManager.deleteDocumentById(unsignedDocument.id)
+                listener(
+                    documentFailed(
+                        unsignedDocument, IllegalStateException(outcome.errorDescription)
+                    )
+                )
+            }
+
+            is SubmissionOutcome.Failed -> {
+                documentManager.deleteDocumentById(unsignedDocument.id)
+                listener(documentFailed(unsignedDocument, outcome.error))
+            }
+        }
+    }
+
+    /*    fun processSubmittedRequest(unsignedDocument: UnsignedDocument, outcome: SubmissionOutcome) {
+        when (outcome) {
+            is SubmissionOutcome.Success -> when (val credential = outcome.credentials[0]) {
+                is IssuedCredential.Issued -> try {
+                    val sdJwt = SDJwt.parse(credential.credential)
+                    val cborBytes = Base64.getDecoder().decode(credential.credential)
+                    logger?.d(TAG, "CBOR bytes: ${Hex.toHexString(cborBytes)}")
+                    documentManager.storeIssuedDocument(unsignedDocument, cborBytes)
+                        .notifyListener(unsignedDocument)
+                }
+                catch (e:Exception)
+                {
+                    try {
                         val cborBytes = Base64.getUrlDecoder().decode(credential.credential)
                         logger?.d(TAG, "CBOR bytes: ${Hex.toHexString(cborBytes)}")
                         documentManager.storeIssuedDocument(unsignedDocument, cborBytes)
@@ -122,111 +170,65 @@ internal class ProcessResponse(
                         documentManager.deleteDocumentById(unsignedDocument.id)
                         listener(documentFailed(unsignedDocument, e))
                     }
-
-                    is IssuedCredential.Deferred -> {
-                        val contextToStore = deferredContextCreator.create(credential)
-                        documentManager.storeDeferredDocument(
-                            unsignedDocument, contextToStore.toByteArray()
-                        ).notifyListener(unsignedDocument, isDeferred = true)
-                    }
                 }
 
-                is SubmissionOutcome.InvalidProof -> {
-                    documentManager.deleteDocumentById(unsignedDocument.id)
-                    listener(
-                        documentFailed(
-                            unsignedDocument, IllegalStateException(outcome.errorDescription)
-                        )
-                    )
-                }
-
-                is SubmissionOutcome.Failed -> {
-                    documentManager.deleteDocumentById(unsignedDocument.id)
-                    listener(documentFailed(unsignedDocument, outcome.error))
-                }
-            }
-        }
-
-        /*    fun processSubmittedRequest(unsignedDocument: UnsignedDocument, outcome: SubmissionOutcome) {
-            when (outcome) {
-                is SubmissionOutcome.Success -> when (val credential = outcome.credentials[0]) {
-                    is IssuedCredential.Issued -> try {
-                        val sdJwt = SDJwt.parse(credential.credential)
-                        val cborBytes = Base64.getDecoder().decode(credential.credential)
-                        logger?.d(TAG, "CBOR bytes: ${Hex.toHexString(cborBytes)}")
-                        documentManager.storeIssuedDocument(unsignedDocument, cborBytes)
-                            .notifyListener(unsignedDocument)
-                    }
-                    catch (e:Exception)
-                    {
-                        try {
-                            val cborBytes = Base64.getUrlDecoder().decode(credential.credential)
-                            logger?.d(TAG, "CBOR bytes: ${Hex.toHexString(cborBytes)}")
-                            documentManager.storeIssuedDocument(unsignedDocument, cborBytes)
-                                .notifyListener(unsignedDocument)
-                        } catch (e: Throwable) {
-                            documentManager.deleteDocumentById(unsignedDocument.id)
-                            listener(documentFailed(unsignedDocument, e))
-                        }
-                    }
-
-                    is IssuedCredential.Deferred -> {
-                        val contextToStore = deferredContextCreator.create(credential)
-                        documentManager.storeDeferredDocument(unsignedDocument, contextToStore.toByteArray())
-                            .notifyListener(unsignedDocument, isDeferred = true)
-                    }
-                }
-
-                is SubmissionOutcome.InvalidProof -> {
-                    documentManager.deleteDocumentById(unsignedDocument.id)
-                    listener(
-                        documentFailed(
-                            unsignedDocument,
-                            IllegalStateException(outcome.errorDescription)
-                        )
-                    )
-                }
-
-                is SubmissionOutcome.Failed -> {
-                    documentManager.deleteDocumentById(unsignedDocument.id)
-                    listener(documentFailed(unsignedDocument, outcome.error))
-                }
-            }
-        }
-    */
-        private fun UserAuthRequiredException.toIssueEvent(
-            unsignedDocument: UnsignedDocument,
-        ): IssueEvent.DocumentRequiresUserAuth {
-            return IssueEvent.DocumentRequiresUserAuth(unsignedDocument,
-                cryptoObject = cryptoObject,
-                resume = { runBlocking { continuations[unsignedDocument.id]!!.resume(true) } },
-                cancel = { runBlocking { continuations[unsignedDocument.id]!!.resume(false) } })
-        }
-
-        private fun StoreDocumentResult.notifyListener(
-            unsignedDocument: UnsignedDocument,
-            isDeferred: Boolean = false,
-        ) = when (this) {
-            is StoreDocumentResult.Success -> {
-                issuedDocumentIds.add(documentId)
-                if (isDeferred) {
-                    listener(
-                        IssueEvent.DocumentDeferred(
-                            documentId, unsignedDocument.name, unsignedDocument.docType
-                        )
-                    )
-                } else {
-                    listener(
-                        IssueEvent.DocumentIssued(
-                            documentId, unsignedDocument.name, unsignedDocument.docType
-                        )
-                    )
+                is IssuedCredential.Deferred -> {
+                    val contextToStore = deferredContextCreator.create(credential)
+                    documentManager.storeDeferredDocument(unsignedDocument, contextToStore.toByteArray())
+                        .notifyListener(unsignedDocument, isDeferred = true)
                 }
             }
 
-            is StoreDocumentResult.Failure -> {
+            is SubmissionOutcome.InvalidProof -> {
                 documentManager.deleteDocumentById(unsignedDocument.id)
-                listener(documentFailed(unsignedDocument, throwable))
+                listener(
+                    documentFailed(
+                        unsignedDocument,
+                        IllegalStateException(outcome.errorDescription)
+                    )
+                )
+            }
+
+            is SubmissionOutcome.Failed -> {
+                documentManager.deleteDocumentById(unsignedDocument.id)
+                listener(documentFailed(unsignedDocument, outcome.error))
             }
         }
     }
+*/
+    private fun UserAuthRequiredException.toIssueEvent(
+        unsignedDocument: UnsignedDocument,
+    ): IssueEvent.DocumentRequiresUserAuth {
+        return IssueEvent.DocumentRequiresUserAuth(unsignedDocument,
+            cryptoObject = cryptoObject,
+            resume = { runBlocking { continuations[unsignedDocument.id]!!.resume(true) } },
+            cancel = { runBlocking { continuations[unsignedDocument.id]!!.resume(false) } })
+    }
+
+    private fun StoreDocumentResult.notifyListener(
+        unsignedDocument: UnsignedDocument,
+        isDeferred: Boolean = false,
+    ) = when (this) {
+        is StoreDocumentResult.Success -> {
+            issuedDocumentIds.add(documentId)
+            if (isDeferred) {
+                listener(
+                    IssueEvent.DocumentDeferred(
+                        documentId, unsignedDocument.name, unsignedDocument.docType
+                    )
+                )
+            } else {
+                listener(
+                    IssueEvent.DocumentIssued(
+                        documentId, unsignedDocument.name, unsignedDocument.docType
+                    )
+                )
+            }
+        }
+
+        is StoreDocumentResult.Failure -> {
+            documentManager.deleteDocumentById(unsignedDocument.id)
+            listener(documentFailed(unsignedDocument, throwable))
+        }
+    }
+}
