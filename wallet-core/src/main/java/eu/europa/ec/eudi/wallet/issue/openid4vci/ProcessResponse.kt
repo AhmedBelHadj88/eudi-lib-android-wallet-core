@@ -97,9 +97,9 @@ internal class ProcessResponse(
         when (outcome) {
             is SubmissionOutcome.Success -> when (val credential = outcome.credentials[0]) {
                 is IssuedCredential.Issued -> try {
+
                     if (isSDJWT(credential.credential)) {
                         val parts = credential.credential.split(".")
-
                         if (parts.size == 3) {
                             val payload =
                                 Base64.getDecoder().decode(parts[1])   // Decode the payload
@@ -114,10 +114,6 @@ internal class ProcessResponse(
                             .notifyListener(unsignedDocument)
                     }
 
-                    val cborBytes = Base64.getUrlDecoder().decode(credential.credential)
-                    logger?.d(TAG, "CBOR bytes: ${Hex.toHexString(cborBytes)}")
-                    documentManager.storeIssuedDocument(unsignedDocument, cborBytes)
-                        .notifyListener(unsignedDocument)
                 } catch (e: Throwable) {
                     documentManager.deleteDocumentById(unsignedDocument.id)
                     listener(documentFailed(unsignedDocument, e))
