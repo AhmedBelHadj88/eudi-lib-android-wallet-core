@@ -31,8 +31,10 @@ test-rules = "1.6.1"
 test-runner = "1.6.2"
 upokecenter-cbor = "4.5.6"
 kotlin-coroutines-test = "1.8.1"
+eudiLibDocumentManager = "v0.1.20-SNAPSHOT"
 
 [libraries]
+eudi-lib-android-wallet-document-manager = { group = "com.github.AhmedBelHadj88", name = "eudi-lib-android-wallet-document-manager", version.ref = "eudiLibDocumentManager" }
 android-identity-credential = { module = "com.android.identity:identity-credential-android", version.ref = "identity-credential-android" }
 android-junit = { module = "androidx.test.ext:junit", version.ref = "junit-android" }
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }

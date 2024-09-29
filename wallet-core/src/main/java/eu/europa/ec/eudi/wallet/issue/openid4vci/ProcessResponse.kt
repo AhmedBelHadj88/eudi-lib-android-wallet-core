@@ -16,6 +16,7 @@
 
 package eu.europa.ec.eudi.wallet.issue.openid4vci
 
+import android.content.Context
 import com.nimbusds.jose.JWSObject
 import com.nimbusds.jwt.JWTParser
 import com.nimbusds.jwt.SignedJWT
@@ -29,6 +30,7 @@ import eu.europa.ec.eudi.wallet.issue.openid4vci.IssueEvent.Companion.documentFa
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager.Companion.TAG
 import eu.europa.ec.eudi.wallet.logging.Logger
 import eu.europa.ec.eudi.wallet.logging.d
+import eu.europa.ec.eudi.wallet.storage.SecureStorageManager
 import id.walt.sdjwt.SDJwt
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.runBlocking
@@ -40,6 +42,7 @@ import java.util.*
 import kotlin.coroutines.resume
 
 internal class ProcessResponse(
+    val secureStorage: SecureStorageManager,
     val documentManager: DocumentManager,
     val deferredContextCreator: DeferredContextCreator,
     val listener: OpenId4VciManager.OnResult<IssueEvent>,
@@ -92,20 +95,32 @@ internal class ProcessResponse(
             return false
         }
     }
+   /* fun sdJwtToCbor(credential: SdJwtVerifiableCredential): ByteArray {
+        // Create a CBORFactory instance
+        val cborFactory = CBORFactory()
+        val objectMapper = ObjectMapper(cborFactory)
 
+        // Convert the credential object to CBOR byte array
+        return objectMapper.writeValueAsBytes(credential)
+    }
+*/
     fun processSubmittedRequest(unsignedDocument: UnsignedDocument, outcome: SubmissionOutcome) {
         when (outcome) {
-            is SubmissionOutcome.Success -> when (val credential = outcome.credentials[0]) {
+            is SubmissionOutcome.Success ->
+                when (val credential = outcome.credentials[0])
+                {
                 is IssuedCredential.Issued -> try {
 
                     if (isSDJWT(credential.credential)) {
                         val parts = credential.credential.split(".")
                         if (parts.size == 3) {
-                            val payload =
+                            // Store SD-JWT tokens
+                            secureStorage.storeSdJwt(unsignedDocument.name, credential.credential)
+                          /*  val payload =
                                 Base64.getDecoder().decode(parts[1])   // Decode the payload
                             logger?.d(TAG, "PAYLOAD bytes: ${Hex.toHexString(payload)}")
-                            documentManager.storeDeferredDocument(unsignedDocument, payload)
-                                .notifyListener(unsignedDocument)
+                            documentManager.storeIssuedDocument(unsignedDocument, payload)
+                                .notifyListener(unsignedDocument)*/
                         }
                     } else {
                         val cborBytes = Base64.getUrlDecoder().decode(credential.credential)

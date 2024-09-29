@@ -24,6 +24,7 @@ import eu.europa.ec.eudi.wallet.document.*
 import eu.europa.ec.eudi.wallet.internal.mainExecutor
 import eu.europa.ec.eudi.wallet.issue.openid4vci.IssueEvent.Companion.failure
 import eu.europa.ec.eudi.wallet.logging.Logger
+import eu.europa.ec.eudi.wallet.storage.SecureStorageManager
 import eu.europa.ec.eudi.wallet.util.wrappedWithContentNegotiation
 import eu.europa.ec.eudi.wallet.util.wrappedWithLogging
 import io.ktor.client.*
@@ -53,6 +54,10 @@ internal class DefaultOpenId4VciManager(
     var logger: Logger? = null
     var ktorHttpClientFactory: () -> HttpClient = DefaultHttpClientFactory
         get() = field.wrappedWithLogging(logger).wrappedWithContentNegotiation()
+
+    private val secureStorage: SecureStorageManager by lazy {
+        SecureStorageManager(context)
+    }
 
     private val offerCreator: OfferCreator by lazy {
         OfferCreator(config, ktorHttpClientFactory)
@@ -209,7 +214,9 @@ internal class DefaultOpenId4VciManager(
         val response = request.request(requestMap).also {
             authorizedRequest = request.authorizedRequest
         }
+
         ProcessResponse(
+            secureStorage = secureStorage,
             documentManager = documentManager,
             deferredContextCreator = DeferredContextCreator(issuer, authorizedRequest),
             listener = listener,
