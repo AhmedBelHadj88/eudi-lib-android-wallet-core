@@ -115,7 +115,7 @@ internal class ProcessResponse(
                         val parts = credential.credential.split(".")
                         if (parts.size == 3) {
                             // Store SD-JWT tokens
-                            secureStorage.storeSdJwt(unsignedDocument.name, credential.credential)
+                            secureStorage.storeSdJwt(unsignedDocument.docType, credential.credential)
                           /*  val payload =
                                 Base64.getDecoder().decode(parts[1])   // Decode the payload
                             logger?.d(TAG, "PAYLOAD bytes: ${Hex.toHexString(payload)}")

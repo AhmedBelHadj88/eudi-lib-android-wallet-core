@@ -91,7 +91,8 @@ internal val CredentialConfiguration.name: String
  */
 internal val CredentialConfiguration.docType: String
     @JvmSynthetic get() = when (this) {
-        is MsoMdocCredential -> docType
+        is MsoMdocCredential,
+        is SdJwtVcCredential -> docType
         else -> "unknown"
     }
 
