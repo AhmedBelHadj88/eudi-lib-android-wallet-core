@@ -235,6 +235,7 @@ object EudiWallet {
      * @return [OpenId4VciManager]
      */
     fun createOpenId4VciManager(): OpenId4VciManager {
+
         return requireInit {
             config.openId4VciConfig?.let { config ->
                 OpenId4VciManager(context) {

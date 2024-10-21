@@ -160,7 +160,7 @@ dependencies {
 
     // Bouncy Castle
     implementation libs.bouncy.castle.prov
-    implementation libs.bouncy.castle.pkix
+   // implementation libs.bouncy.castle.pkix
 
     implementation libs.upokecenter.cbor
     implementation libs.cose.java
